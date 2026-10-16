@@ -1,6 +1,11 @@
+# Folders to ignore
 data/**
+notebooks/**
+
+# Random artifacts to ignore
 **/.python-version
 **/.DS_STORE
 **/.ipynb_checkpoints
 **/.idea
+**/__pycache__
 
