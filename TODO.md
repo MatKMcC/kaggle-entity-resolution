@@ -1,5 +1,12 @@
 - [x] Create Permanent Train / Test / Eval Case - splitting matches into 80/10/10. Test / eval matches are never used as 
 negative training cases
 - [x] Split notebook into scripts
-- [ ] Update evaluation metrics to better suit the problem (identify hard matches) and track raw numbers
-- [ ] Add ML Flow to track aspects of featurization, training and modelling -- key is timing of the entire scrip
+- [x] Update evaluation metrics to better suit the problem (identify hard matches) and track raw numbers
+- [x] Update evaluation metrics to better suit the problem (identify hard matches) and track raw numbers
+- [ ] Track true reduction ratio to track improvements via blocking
+- [ ] Create test Cases for Faster iteration
+- [ ] Re-org to make the pipeline config oriented - run.py, pipeline.py and function calls
+- [ ] Parametrize seeds, parameters and paths for use in the config
+- [ ] Add ML Flow to track metrics
+- [ ] Add DVC to track datasets and smooth iteration
+- [ ] Add address featurization to enable better blocking (region, town, etc.)

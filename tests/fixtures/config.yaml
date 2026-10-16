@@ -1,0 +1,11 @@
+train_entities: './tests/fixtures/source/source1.tsv'
+train_datasets: ['./tests/fixtures/source/source2.tsv', './tests/fixtures/source/source3.tsv']
+ground_truth: './tests/fixtures/source/ground_truth.tsv'
+set_assignments: './tests/fixtures/source/set_assignments.tsv'
+model_path: './tests/fixtures/models/logistic_model.joblib'
+predict_entities: './tests/fixtures/source/source1.tsv'
+predict_datasets: ['./tests/fixtures/source/source2.tsv', './tests/fixtures/source/source3.tsv']
+predicted_matches: './tests/fixtures/predictions'
+runtime_cutoff: 10
+evaluate_datasets: ['train', 'validation', 'holdout']
+evaluation_metrics: './tests/fixtures/evaluations'
