@@ -1,6 +1,8 @@
 import pickle
 from pathlib import Path
+import argparse
 
+from preparation import Context
 
 def _true_positives(ground_truth, predictions):
     return len(ground_truth.intersection(predictions))
@@ -39,10 +41,13 @@ def f1_score(ground_truth, predictions):
 
 
 def display_metrics(_metrics, _partition):
-    print(f"{'Matches Found:':<40} {_metrics['matches']:>15,.0f}")
-    print(f"{'Precision Score:':<40} {_metrics['precision']:>15,.2%}")
-    print(f"{'Recall Score:':<40} {_metrics['recall']:>15,.2%}")
-    print(f"{'F1 Score:':<40} {_metrics['f1_score']:>15,.2%}")
+    print(f'{'-' * 71}')
+    print(f"{'Matches Found:':<40} {_metrics['matches']:>30,.0f}")
+    print(f"{'Precision Score:':<40} {_metrics['precision']:>30,.2%}")
+    print(f"{'Recall Score:':<40} {_metrics['recall']:>30,.2%}")
+    print(f"{'F1 Score:':<40} {_metrics['f1_score']:>30,.2%}")
+    print(f'{'-' * 71}')
+    print()
 
 
 def evaluate(ground_truth, predictions, combinations_checked, run_time):
@@ -64,21 +69,27 @@ def evaluate_matches(context):
         tmp = pickle.load(f)
     combinations_checked = tmp.pop('combinations_checked')
     run_time = tmp.pop('runtime')
+    total_combinations = tmp.pop('total_combinations')
+    search_combinations = tmp.pop('search_combinations')
     predictions = set()
     for entity in tmp:
         for match in tmp[entity]:
             predictions.add((entity, match))
 
+    print('Total Prediction Run Time Metrics')
+    print(f'{'-' * 71}')
+    print(f'{'Run Time Metrics For Prediction Set:'}')
+    print(f"{'Combinations Checked:':<40} {combinations_checked:>30,.2f}")
+    print(f"{'Total Possible Combinations:':<40} {total_combinations:>30,.2f}")
+    print(f"{'Search Efficiency:':<40} {len(predictions) / combinations_checked:>30,.2%}")
+    print(f"{'Reduction Score:':<40} {(search_combinations - combinations_checked) / search_combinations:>30,.2%}")
+    print(f"{'Run Time:':<40} {run_time / 60.:>26,.2f} min")
+    print(f'{'-' * 71}')
     print()
-    print('---------------------------------')
-    print(f'{'Run Time Metrics For Prediction Set:':<40}')
-    print(f"{'Combinations Checked:':<40} {combinations_checked:>15,.2f}")
-    print(f"{'Efficiency:':<40} {len(predictions) / combinations_checked:>15,.2%}")
-    print(f"{'Run Time:':<40} {run_time / 60.:>11,.2f} min")
 
     # iterate over partitions and generate metrics
     for partition in context.config['evaluate_datasets']:
-        print('---------------------------------')
+        print(f"Evaluation Metrics for {partition}")
 
         set_known_matches = {(k, v) for k, v in context.known_matches.items() if context.set_assignments[k] == partition}
         set_predictions = {el for el in predictions if context.set_assignments[el[0]] == partition}
@@ -94,3 +105,11 @@ def evaluate_matches(context):
 
     return None
 
+
+if __name__ == '__main__':
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--config', required=True)
+    args = arg_parser.parse_args()
+
+    context = Context(args.config)
+    evaluate_matches(context)

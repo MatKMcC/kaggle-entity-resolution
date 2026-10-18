@@ -3,6 +3,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import argparse
+import yaml
 
 
 def _partition_assignment(rng):
@@ -19,11 +21,21 @@ class Context:
 
     # The Constructor Method (initializes each new object)
     def __init__(self, config):
+        if type(config) == str:
+            with open(config, 'r') as f:
+                config = yaml.safe_load(f)
         self.config = config
 
-    # surface the config settings
+        # initialize random states
+        random_states = {}
+        for state in self.config['random_states']:
+            random_states[state] = np.random.RandomState(self.config['random_states'][state])
+        self.random_states = random_states
+
+    # surface the config.yaml settings
     # def __getattr__(self, name):
-    #   return getattr(self.config, name)
+    #   return getattr(self.config.yaml, name)
+
     @lru_cache
     def _load_datasets(self, *datasets):
         # load matchable dataset and filter to unmatched
@@ -79,7 +91,7 @@ class Context:
     def set_assignments(self):
         if not Path(self.config['set_assignments']).exists():
             # create a list of all observed entities -- grouping matched entities and assigning to partition
-            rng = np.random.default_rng()
+            rng = self.random_states['preparation']
             tmp = defaultdict(lambda: {'matches': [], 'partition': _partition_assignment(rng)})
             seen_entities = set()
             for matched_entity_id, entity_id in self.known_matches.items():
@@ -110,16 +122,18 @@ class Context:
         return partitions
 
 
-def summarize_output(context, assignments = None):
+def summarize_output(context):
     counts = Counter(context.set_assignments.values())
     total_entities = len(context.set_assignments)
     print()
-    print('---------------------------------')
-    print(f"{'Total Entities Assigned:':<40} {total_entities:>15,.0f}")
-    print(f"{'Training Proportion:':<40} {counts['train'] / total_entities:>15,.2f}")
-    print(f"{'Validation Proportion:':<40} {counts['validation'] / total_entities:>15,.2f}")
-    print(f"{'Holdout Proportion:':<40} {counts['holdout'] / total_entities:>15,.2f}")
-
+    print("Assigning Data to Training, Validation and Holdout Sets")
+    print(f'{'-' * 71}')
+    print(f"{'Total Entities Assigned:':<40} {total_entities:>30,.0f}")
+    print(f"{'Training Proportion:':<40} {counts['train'] / total_entities:>30,.2f}")
+    print(f"{'Validation Proportion:':<40} {counts['validation'] / total_entities:>30,.2f}")
+    print(f"{'Holdout Proportion:':<40} {counts['holdout'] / total_entities:>30,.2f}")
+    print(f'{'-' * 71}')
+    print()
 
 def prepare_context(config):
     context = Context(config)
@@ -127,9 +141,11 @@ def prepare_context(config):
     return context
 
 
-
-
-
+if __name__ == '__main__':
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--config', required=True)
+    args = arg_parser.parse_args()
+    prepare_context(args.config)
 
 
 

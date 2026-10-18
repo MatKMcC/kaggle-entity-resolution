@@ -1,4 +1,4 @@
-from src import *
+from pipeline import pipeline
 import argparse
 
 if __name__ == '__main__':
@@ -6,6 +6,4 @@ if __name__ == '__main__':
     parser.add_argument('--config'
         , default='./config.yaml')
     args = parser.parse_args()
-    print(args.config)
-    cfg = config(args.config)
-    metrics = pipeline(cfg)
+    metrics = pipeline(args.config)

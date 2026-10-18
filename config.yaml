@@ -6,6 +6,9 @@ model_path: './data/models/logistic_model.joblib'
 predict_entities: './data/source/train/source1.tsv'
 predict_datasets: ['./data/source/train/source2.tsv', './data/source/train/source3.tsv']
 predicted_matches: './data/predictions'
-runtime_cutoff: 10
+runtime_cutoff: 1
 evaluate_datasets: ['train', 'validation', 'holdout']
 evaluation_metrics: './data/evaluations'
+random_states:
+  preparation: 0
+  training: 0

@@ -1,5 +1,4 @@
 # Folders to ignore
-data/**
 notebooks/**
 
 # Random artifacts to ignore
@@ -9,3 +8,4 @@ notebooks/**
 **/.idea
 **/__pycache__
 
+/data

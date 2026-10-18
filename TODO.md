@@ -1,12 +1,11 @@
-- [x] Create Permanent Train / Test / Eval Case - splitting matches into 80/10/10. Test / eval matches are never used as 
-negative training cases
-- [x] Split notebook into scripts
-- [x] Update evaluation metrics to better suit the problem (identify hard matches) and track raw numbers
-- [x] Update evaluation metrics to better suit the problem (identify hard matches) and track raw numbers
-- [ ] Track true reduction ratio to track improvements via blocking
-- [ ] Create test Cases for Faster iteration
-- [ ] Re-org to make the pipeline config oriented - run.py, pipeline.py and function calls
-- [ ] Parametrize seeds, parameters and paths for use in the config
-- [ ] Add ML Flow to track metrics
-- [ ] Add DVC to track datasets and smooth iteration
+- [x] Create Permanent Train / Test / Eval Case - splitting matches into 80/10/10 - DS duh
+- [x] Split notebook into scripts - use to start oragnization and standardize runs
+- [x] Update evaluation metrics to better suit the problem (identify hard and "best match" and scan search surface)
+- [x] Create test Cases - use to check non breaking code changes and faster iteration
+- [x] Re-org to make the pipeline config / context oriented - run.py, pipeline.py and function calls
+- [x] Track reduction ratio to track improvements via blocking - doing an approximation of this because we are at 0
+- [x] Add DVC - use to track datasets to avoid repeat operation and speed iteration
+- [ ] Add ML Flow - use to track metrics for progress reports
+- [ ] Parametrize seeds, parameters and paths for use in the config - use to check ML flow and DVC to check run consistency
 - [ ] Add address featurization to enable better blocking (region, town, etc.)
+- [ ] Add centralized logging - for that nice clean organized feeling

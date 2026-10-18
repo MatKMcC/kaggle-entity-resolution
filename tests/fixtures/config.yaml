@@ -9,3 +9,6 @@ predicted_matches: './tests/fixtures/predictions'
 runtime_cutoff: 10
 evaluate_datasets: ['train', 'validation', 'holdout']
 evaluation_metrics: './tests/fixtures/evaluations'
+random_states:
+  preparation: 0
+  training: 0

@@ -11,8 +11,8 @@ from pathlib import Path
 import numpy as np
 import argparse
 
-from .featurize import featurize
-
+from preparation import Context
+from featurize import featurize
 
 def run_predict(entities, datasets, runtime_cutoff, quick_predict):
     # iterate over combinations to find a match
@@ -20,7 +20,10 @@ def run_predict(entities, datasets, runtime_cutoff, quick_predict):
     minutes = 0
     start_time = time.perf_counter()
     matches_found = defaultdict(list)
+
+    search_combinations = 0
     for potential_match in datasets:
+        search_combinations += len(entities)
         for entity in entities:
 
             counts += 1
@@ -41,8 +44,8 @@ def run_predict(entities, datasets, runtime_cutoff, quick_predict):
 
             if (time.perf_counter() - start_time) / 60. > runtime_cutoff:
                 print(f"{int(runtime_cutoff)} Minute Timeout")
-                return matches_found, counts, start_time
-    return matches_found, counts, start_time
+                return matches_found, counts, start_time, len(datasets) * len(entities), search_combinations
+    return matches_found, counts, start_time, len(datasets) * len(entities), search_combinations
 
 
 def make_matches(context):
@@ -62,18 +65,33 @@ def make_matches(context):
     datasets = context.predict_datasets
     entities = context.predict_entities
     runtime_cutoff = float(context.config['runtime_cutoff'])
-    matches_found, counts, start_time = run_predict(entities, datasets, runtime_cutoff, quick_predict)
+    matches_found, counts, start_time, total_combinations, search_combinations = run_predict(entities, datasets, runtime_cutoff, quick_predict)
 
     print()
-    print('------------------------------------------------')
-    print(f"Combinations Checked: {counts:,.0f}")
-    print(f"Matches Found: {sum([len(matches_found[el]) for el in matches_found]):,.0f}")
+    print('Predicted Matches for Entities')
+    print(f'{'-' * 71}')
+    print(f"{'Combinations Checked:':<40} {counts:>30,.0f}")
+    print(f"{'Matches Found:':<40} {sum([len(matches_found[el]) for el in matches_found]):>30,.0f}")
+    print(f'{'-' * 71}')
+    print()
+
     matches_found['combinations_checked'] = counts
     matches_found['runtime'] = time.perf_counter() - start_time
+    matches_found['total_combinations'] = total_combinations
+    matches_found['search_combinations'] = search_combinations
     pth = Path(context.config['predicted_matches'])
     pth.mkdir(parents=True, exist_ok=True)
     with open(str(pth / 'predictions.pkl'), "wb") as f:
         pickle.dump(matches_found, f)
+
+
+if __name__ == '__main__':
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--config', required=True)
+    args = arg_parser.parse_args()
+
+    context = Context(args.config)
+    make_matches(context)
 
 
 

@@ -1,0 +1,59 @@
+stages:
+  prepare_data:
+    cmd: python src/preparation.py --config config.yaml
+    deps:
+      - src/preparation.py
+      - data/source/train/source1.tsv
+      - data/source/train/source2.tsv
+      - data/source/train/source3.tsv
+      - data/source/train/ground_truth.tsv
+    params:
+      - config.yaml:
+        - train_entities
+        - train_datasets
+        - ground_truth
+        - random_states.preparation
+    outs:
+      - data/source/train/set_assignments.tsv
+
+  train_model:
+    cmd: python src/train.py --config config.yaml
+    deps:
+      - src/train.py
+      - src/featurize.py
+      - data/source/train/set_assignments.tsv
+    params:
+      - config.yaml:
+        - train_entities
+        - train_datasets
+        - set_assignments
+        - model_path
+        - random_states.training
+    outs:
+      - data/models/logistic_model.joblib
+
+  make_matches:
+    cmd: python src/predict.py --config config.yaml
+    deps:
+      - src/predict.py
+      - data/models/logistic_model.joblib
+    params:
+      - config.yaml:
+        - predict_entities
+        - predict_datasets
+        - predicted_matches
+        - runtime_cutoff
+    outs:
+      - data/predictions/predictions.pkl
+
+  evaluate_matches:
+    cmd: python src/evaluate.py --config config.yaml
+    deps:
+      - src/evaluate.py
+      - data/predictions/predictions.pkl
+    params:
+      - config.yaml:
+        - evaluate_datasets
+        - evaluation_metrics
+    outs:
+      - data/evaluations/metrics.pkl
