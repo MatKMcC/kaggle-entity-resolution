@@ -1,0 +1,122 @@
+schema: '2.0'
+stages:
+  prepare_data:
+    cmd: python ../src/preparation.py --config config.yaml
+    deps:
+    - path: ../data/source/sample/ground_truth.tsv
+      hash: md5
+      md5: dea934bdc0b831e2f67040b919996026
+      size: 100302
+    - path: ../data/source/sample/source1.tsv
+      hash: md5
+      md5: d086204ff6c6d3d060592b38aa5e09a1
+      size: 162959
+    - path: ../data/source/sample/source2.tsv
+      hash: md5
+      md5: 8de8976d8da4eaa27af5b99f5d0aaffb
+      size: 382522
+    - path: ../data/source/sample/source3.tsv
+      hash: md5
+      md5: e9e7e2ba8e647e5a37c6f5484b599919
+      size: 388913
+    - path: ../src/preparation.py
+      hash: md5
+      md5: 8b08fdb53f748dd1e723cd0e19c8b950
+      size: 6727
+    params:
+      params.yaml:
+        config: config.yaml
+      config.yaml:
+        ground_truth: ../data/source/sample/ground_truth.tsv
+        random_states.preparation: 0
+        train_datasets:
+        - ../data/source/sample/source2.tsv
+        - ../data/source/sample/source3.tsv
+        train_entities: ../data/source/sample/source1.tsv
+    outs:
+    - path: ../data/source/sample/set_assignments.tsv
+      hash: md5
+      md5: 58fdc2a8d002091b2d273455ab504847
+      size: 193094
+  train_model:
+    cmd: python ../src/train.py --config config.yaml
+    deps:
+    - path: ../data/source/sample/set_assignments.tsv
+      hash: md5
+      md5: 58fdc2a8d002091b2d273455ab504847
+      size: 193094
+    - path: ../src/featurize.py
+      hash: md5
+      md5: 5430d6afac33f301b322b3bef6845c52
+      size: 2076
+    - path: ../src/train.py
+      hash: md5
+      md5: 31456ad6c0d005cbd105ecc4f1307872
+      size: 3385
+    params:
+      params.yaml:
+        config: config.yaml
+      config.yaml:
+        model_path: ../data/source/sample/models/logistic_model.joblib
+        random_states.training: 0
+        set_assignments: ../data/source/sample/set_assignments.tsv
+        train_datasets:
+        - ../data/source/sample/source2.tsv
+        - ../data/source/sample/source3.tsv
+        train_entities: ../data/source/sample/source1.tsv
+    outs:
+    - path: ../data/source/sample/models/logistic_model.joblib
+      hash: md5
+      md5: 1b7623d7c592af070de2670ad92e1cd6
+      size: 947
+  make_matches:
+    cmd: python ../src/predict.py --config config.yaml
+    deps:
+    - path: ../data/source/sample/models/logistic_model.joblib
+      hash: md5
+      md5: 1b7623d7c592af070de2670ad92e1cd6
+      size: 947
+    - path: ../src/predict.py
+      hash: md5
+      md5: ef333bed2808d39627f0ec187f8e8c75
+      size: 4715
+    params:
+      params.yaml:
+        config: config.yaml
+      config.yaml:
+        predict_datasets:
+        - ../data/source/sample/source2.tsv
+        - ../data/source/sample/source3.tsv
+        predict_entities: ../data/source/sample/source1.tsv
+        predicted_matches: ../data/source/sample/predictions
+        runtime_cutoff: 10
+    outs:
+    - path: ../data/source/sample/predictions/predictions.pkl
+      hash: md5
+      md5: 212c65f4c2e6bfffbd4d6f638a8280ac
+      size: 121546
+  evaluate_matches:
+    cmd: python ../src/evaluate.py --config config.yaml
+    deps:
+    - path: ../data/source/sample/predictions/predictions.pkl
+      hash: md5
+      md5: 212c65f4c2e6bfffbd4d6f638a8280ac
+      size: 121546
+    - path: ../src/evaluate.py
+      hash: md5
+      md5: 0faae6102d856780cf897229947f46cf
+      size: 3044
+    params:
+      params.yaml:
+        config: config.yaml
+      config.yaml:
+        evaluate_datasets:
+        - train
+        - validation
+        - holdout
+        evaluation_metrics: ../data/source/sample/evaluations
+    outs:
+    - path: ../data/source/sample/evaluations/metrics.pkl
+      hash: md5
+      md5: d315556bfa55ce2a13551fecaac52d29
+      size: 75

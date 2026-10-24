@@ -1,0 +1,22 @@
+evaluate_datasets:
+- train
+- validation
+- holdout
+evaluation_metrics: ../data/source/sample/evaluations
+experiment: starting_run
+ground_truth: ../data/source/sample/ground_truth.tsv
+model_path: ../data/source/sample/models/logistic_model.joblib
+predict_datasets:
+- ../data/source/sample/source2.tsv
+- ../data/source/sample/source3.tsv
+predict_entities: ../data/source/sample/source1.tsv
+predicted_matches: ../data/source/sample/predictions
+random_states:
+  preparation: 0
+  training: 0
+runtime_cutoff: 10
+set_assignments: ../data/source/sample/set_assignments.tsv
+train_datasets:
+- ../data/source/sample/source2.tsv
+- ../data/source/sample/source3.tsv
+train_entities: ../data/source/sample/source1.tsv
