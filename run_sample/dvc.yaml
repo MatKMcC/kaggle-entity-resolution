@@ -17,12 +17,35 @@ stages:
     outs:
       - ../data/source/sample/set_assignments.tsv
 
+  preprocess_data:
+    cmd: python ../src/preprocess.py --config ${config}
+    deps:
+      - ../src/preprocess.py
+      - ../data/source/sample/source1.tsv
+      - ../data/source/sample/source2.tsv
+      - ../data/source/sample/source3.tsv
+      - ../data/source/sample/ground_truth.tsv
+    params:
+      - config
+      - config.yaml:
+          - train_entities
+          - train_datasets
+          - ground_truth
+          - random_states.preparation
+    outs:
+      - ../data/processed/sample/source1.tsv
+      - ../data/processed/sample/source2.tsv
+      - ../data/processed/sample/source3.tsv
+
   train_model:
     cmd: python ../src/train.py --config ${config}
     deps:
       - ../src/train.py
       - ../src/featurize.py
       - ../data/source/sample/set_assignments.tsv
+      - ../data/processed/sample/source1.tsv
+      - ../data/processed/sample/source2.tsv
+      - ../data/processed/sample/source3.tsv
     params:
       - config
       - config.yaml:
